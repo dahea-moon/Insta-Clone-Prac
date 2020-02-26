@@ -115,10 +115,10 @@ def update_comment(request, posting_id, comment_id):
             form = CommentForm(request.POST, instance=comment)
             if form.is_valid():
                 comment = form.save()
-                return redirect(posting)
+                return redirect('posting_detail', id=comment.posting.id)
         else:
             form = CommentForm(instance=comment)
-   return redirect('posting_detail', id=comment.posting.id)
+    return redirect('posting_detail', id=comment.posting.id)
 
 
 @login_required
