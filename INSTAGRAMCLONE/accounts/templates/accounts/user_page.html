@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class='row my-5 mx-auto'>
+    <div class="col-4 d-flex justify-content-center">
+        <img src="https://picsum.photos/100/100" alt="random-image" class="rounded-circle">
+    </div>
+    <div class="col-5">
+        <div class="row">
+            <h2>{{user_info.username}}</h2>
+            {% if user != user_info %}
+                <a href="{% url 'accounts:follow' user_info.id %}" class="btn btn-light mx-3">
+                    {% if user_info in user.followers.all %}Follow{% else %}Follow{% endif %}
+                </a>
+            {% else %}
+                <a href="#" class="btn btn-light mx-3">Edit Profile</a>
+            {% endif %}
+        </div>
+        <div class="row d-flex justify-content-between">
+            <h4>Postings` {{user_info.postings.count}}</h4>
+            <h4>Followers {{user_info.followers.count}}</h4>
+            <h4>Followings {{user_info.followings.count}}</h4>
+        </div>
+        <div class="row">
+            <h4>Hi!</h4>
+        </div>
+    </div>
+</div>
+<div class="card-columns">
+    {% for posting in user_info.postings.all %}
+        {% include 'postings/_posting.html' %}
+    {% endfor %}
+</div>
+{% endblock body %}
