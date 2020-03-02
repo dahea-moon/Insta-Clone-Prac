@@ -19,7 +19,7 @@ def posting_detail(request, posting_id):
     posting = get_object_or_404(Posting, id=posting_id)
     comment_form = CommentForm()
     is_like = posting.like_users.filter(id=request.user.id).exists()
-    return rende(request, 'postings/posting_deetail.html', {
+    return render(request, 'postings/posting_detail.html', {
         'posting': posting,
         'comment_form': comment_form,
         'is_like': is_like,
@@ -29,8 +29,8 @@ def posting_detail(request, posting_id):
 @login_required
 @require_http_methods(['GET', 'POST'])
 def create_posting(request):
-    images = request.FILES.getlist('files')
-
+    images = request.FILES.getlist('file')
+    
     if request.method == 'POST':
         posting_form = PostingForm(request.POST)
         if posting_form.is_valid() and len(images) <=5:
@@ -39,7 +39,7 @@ def create_posting(request):
             posting.save()
 
             # 띄어쓰기를 기준으로 split
-            words = posting.content.split()
+            words = posting.contents.split()
             for word in words:
                 if word[0] == '#':
                     # get_or_create는 list를 return
@@ -95,12 +95,12 @@ def delete_posting(request, posting_id):
 
 @login_required
 @require_POST
-def create_comment(reequest, posting_id):
+def create_comment(request, posting_id):
     posting = get_object_or_404(Posting, id=posting_id)
     form = CommentForm(request.POST)
     if form.is_valid():
         comment = form.save(commit=False)
-        commnt.author = request.user
+        comment.author = request.user
         comment.posting = posting
         comment.save()
     return redirect(posting)
@@ -132,7 +132,7 @@ def delete_comment(request, posting_id, comment_id):
 
 @login_required
 @require_POST
-def toggle_like(request, posting_Id):
+def toggle_like(request, posting_id):
     if request.is_ajax():
         posting = get_object_or_404(Posting, id=posting_id)
         user = request.user

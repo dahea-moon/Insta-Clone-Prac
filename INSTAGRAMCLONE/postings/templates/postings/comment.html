@@ -1,0 +1,19 @@
+{% load bootstrap4 %}
+    <form action="{% url 'postings:create_comment' posting.id %}" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form comment_form %}
+        {% buttons %}
+            <input type="submit" value="Submit" class="btn btn-primary">
+        {% endbuttons %}
+    </form>
+    <ul class="list-group list-group-flush">
+        {% for comment in posting.comments.all %}
+            <li class="list-group-item">
+                <strong>{{ comment.author.username }}</strong> | {{ comment.content }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">
+                Write first Comment!
+            </li>
+        {% endfor %}
+    </ul>

@@ -12,14 +12,14 @@ User = get_user_model()
 @require_http_methods(['GET', 'POST'])
 def signup(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return redirect('/instagram/')
     
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return redirect('/')
+            return redirect('/instagram/')
     else:
         form = CustomUserCreationForm()
     return render(request, 'accounts/signup.html', {
@@ -30,13 +30,13 @@ def signup(request):
 @require_http_methods(['GET', 'POST'])
 def login(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return redirect('/instagram/')
 
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('/')
+            return redirect('/instagram/')
     else:
         form = CustomAuthenticationForm()
     return render(request, 'accounts/login.html', {
@@ -46,7 +46,7 @@ def login(request):
 
 def logout(request):
     auth_logout(request)
-    return redirect('/')
+    return redirect('/instagram/')
 
 
 @require_GET

@@ -1,1 +1,42 @@
-{% extends 'base.html' %}
+<div class="card my-3">
+  <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        {% for image in posting.images.all %}
+          <img src="{{ image.file.url }}" class="d-block w-100" alt="...">
+        {% endfor %}
+      </div>
+    </div>
+    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{ posting.contents }}</p>
+    {% if posting.hashtags %}
+      <p class="card-text"> {{ posting.hashtags.tags }}</p>
+    {% endif %}
+    <form action="{% url 'postings:like' posting.id %}" method="post">
+      {% csrf_token %}
+      <button>
+        {% if is_like %}
+        Unlike
+        {% else %}
+        Like
+        {% endif %}
+      </button>
+    </form>
+    <form action="{% url 'postings:update_posting' posting.id %}" method="get">
+      <button type="submit" class="btn btn-primary"> Edit </button>
+    </form>
+    <form action="{% url 'postings:delete_posting' posting.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Delete</button>
+    </form>
+  </div>
+</div>
