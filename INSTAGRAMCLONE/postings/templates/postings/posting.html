@@ -1,11 +1,11 @@
 <div class="card my-3">
   <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
     <div class="carousel-inner">
-      <div class="carousel-item active">
-        {% for image in posting.images.all %}
+      {% for image in posting.images.all %}
+      <div class="carousel-item {% if forloop.first %} active {% endif %}">
           <img src="{{ image.file.url }}" class="d-block w-100" alt="...">
-        {% endfor %}
       </div>
+      {% endfor %}
     </div>
     <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -21,22 +21,26 @@
     {% if posting.hashtags %}
       <p class="card-text"> {{ posting.hashtags.tags }}</p>
     {% endif %}
-    <form action="{% url 'postings:like' posting.id %}" method="post">
-      {% csrf_token %}
-      <button>
-        {% if is_like %}
-        Unlike
-        {% else %}
-        Like
-        {% endif %}
-      </button>
-    </form>
-    <form action="{% url 'postings:update_posting' posting.id %}" method="get">
-      <button type="submit" class="btn btn-primary"> Edit </button>
-    </form>
-    <form action="{% url 'postings:delete_posting' posting.id %}" method="post">
+    <form action="#" class="form-inline">
+      <form action="{% url 'postings:like' posting.id %}" method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-warning">Delete</button>
+        <button>
+          {% if is_like %}
+          Unlike
+          {% else %}
+          Like
+          {% endif %}
+        </button>
+      </form>
+      {% if posting.author == user %}
+        <form action="{% url 'postings:update_posting' posting.id %}" method="get">
+          <button type="submit" class="btn btn-primary"> Edit </button>
+        </form>
+        <form action="{% url 'postings:delete_posting' posting.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">Delete</button>
+        </form>
+      {% endif %}
     </form>
   </div>
 </div>

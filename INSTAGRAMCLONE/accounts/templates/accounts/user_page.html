@@ -16,7 +16,7 @@
             {% endif %}
         </div>
         <div class="row d-flex justify-content-between">
-            <h4>Postings` {{user_info.postings.count}}</h4>
+            <h4>Postings {{user_info.postings.count}}</h4>
             <h4>Followers {{user_info.followers.count}}</h4>
             <h4>Followings {{user_info.followings.count}}</h4>
         </div>
@@ -27,7 +27,7 @@
 </div>
 <div class="card-columns">
     {% for posting in user_info.postings.all %}
-        {% include 'postings/_posting.html' %}
+        {% include 'postings/posting.html' %}
     {% endfor %}
 </div>
 {% endblock body %}

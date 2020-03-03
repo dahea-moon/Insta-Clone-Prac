@@ -15,6 +15,7 @@ class ImageForm(forms.ModelForm):
             'file': forms.FileInput(attrs={'multiple': True})
         }
 
+ImageFormset = forms.inlineformset_factory(Posting, Image, form=ImageForm, extra=5)
 
 class CommentForm(forms.ModelForm):
     class Meta:

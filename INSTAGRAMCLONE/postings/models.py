@@ -42,5 +42,5 @@ class Image(models.Model):
 
 class Comment(TimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-    posting = models.ForeignKey(Posting, on_delete=models.CASCADE)
+    posting = models.ForeignKey(Posting, on_delete=models.CASCADE, related_name="comments")
     content = models.CharField(max_length=140)

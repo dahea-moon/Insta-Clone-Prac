@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.db import transaction
 from .models import Posting, Comment, HashTag
-from .forms import PostingForm, ImageForm, CommentForm
+from .forms import PostingForm, ImageForm, CommentForm, ImageFormset
 
 
 @require_GET
@@ -17,10 +18,12 @@ def posting_list(request):
 @require_GET
 def posting_detail(request, posting_id):
     posting = get_object_or_404(Posting, id=posting_id)
+    user = request.user
     comment_form = CommentForm()
     is_like = posting.like_users.filter(id=request.user.id).exists()
     return render(request, 'postings/posting_detail.html', {
         'posting': posting,
+        'user': user,
         'comment_form': comment_form,
         'is_like': is_like,
     })
@@ -29,14 +32,17 @@ def posting_detail(request, posting_id):
 @login_required
 @require_http_methods(['GET', 'POST'])
 def create_posting(request):
-    images = request.FILES.getlist('file')
-    
     if request.method == 'POST':
         posting_form = PostingForm(request.POST)
-        if posting_form.is_valid() and len(images) <=5:
+        image_form = ImageFormset(request.POST, request.FILES)
+        if posting_form.is_valid() and image_form.is_valid():
             posting = posting_form.save(commit=False)
             posting.author = request.user
-            posting.save()
+
+            with transaction.atomic():
+                posting.save()
+                image_form.instance = posting
+                image_form.save()
 
             # 띄어쓰기를 기준으로 split
             words = posting.contents.split()
@@ -45,18 +51,11 @@ def create_posting(request):
                     # get_or_create는 list를 return
                     tag = HashTag.objects.get_or_create(content=word)
                     posting.hashtags.add(tag[0])
-            
-            for image in images:
-                request.FILES['file'] = image
-                image_form = ImageForm(files=request.FILES, )
-                if image_form.is_valid():
-                    image = image_form.save(commit=False)
-                    image.posting = posting
-                    image.save()
+
             return redirect(posting)
     else:
         posting_form = PostingForm()
-        image_form = ImageForm()
+        image_form = ImageFormset()
     return render(request, 'postings/posting_form.html', {
         'posting_form': posting_form,
         'image_form': image_form,
@@ -68,7 +67,7 @@ def create_posting(request):
 def update_posting(request, posting_id):
     posting = get_object_or_404(Posting, id=posting_id)
     if posting.author == request.user:
-        if request.mehotd == 'POST':
+        if request.method == 'POST':
             form = PostingForm(request.POST, instance=posting)
             if form.is_valid():
                 posting = form.save()
@@ -77,7 +76,7 @@ def update_posting(request, posting_id):
             form = PostingForm(instance=posting)
     else:
         return redirect(posting)
-    return render(request, 'posting/posting_form.html', {
+    return render(request, 'postings/posting_form.html', {
         'posting_form': form,
     })
 
