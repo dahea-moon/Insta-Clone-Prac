@@ -123,15 +123,17 @@ def update_comment(request, posting_id, comment_id):
 @login_required
 @require_POST
 def delete_comment(request, posting_id, comment_id):
+    posting = get_object_or_404(Posting, id=posting_id)
     comment = get_object_or_404(Comment, id=comment_id)
     if comment.author == request.user:
         comment.delete()
-    return redirect('posting_detail', id=posting_id)
+    return redirect('posting_detail', id=posting.id)
 
 
 @login_required
-@require_POST
 def toggle_like(request, posting_id):
+    ajx = request.is_ajax()
+    print(ajx)
     if request.is_ajax():
         posting = get_object_or_404(Posting, id=posting_id)
         user = request.user
@@ -141,14 +143,16 @@ def toggle_like(request, posting_id):
         else:
             posting.like_users.add(user)
             liked = True
-        
+        like_count = posting.like_users.count()
+
         context = {
             'posting_id': posting.id,
             'user_id': user.id,
             'liked': liked,
+            'like_count': like_count,
         }
         return JsonResponse(context)
-    else:
-        return HttpResponseBadRequest(context)
+    # else:
+    #     return HttpResponseBadRequest()
 
 
