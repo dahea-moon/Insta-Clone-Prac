@@ -49,7 +49,7 @@ def create_posting(request):
             for word in words:
                 if word[0] == '#':
                     # get_or_create는 list를 return
-                    tag = HashTag.objects.get_or_create(content=word)
+                    tag = HashTag.objects.get_or_create(tags=word)
                     posting.hashtags.add(tag[0])
 
             return redirect(posting)

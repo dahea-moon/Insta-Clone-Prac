@@ -19,13 +19,15 @@
   <div class="card-body">
     <a class="card-text" href="{% url 'accounts:user_page' posting.author.id %}"> <strong>{{ posting.author }}</strong></a>
     <p class="card-text">{{ posting.contents }}</p>
-    {% if posting.hashtags %}
-      <p class="card-text"> {{ posting.hashtags.tags }}</p>
-    {% endif %}
+    <p>
     <span id="like">
       <i class="{% if is_like %} fas {% else %} far {% endif %} fa-heart"></i>    
     </span>
     <strong id="like-count">{{ posting.like_users.count }}</strong>
+    </p>
+    {% for tag in posting.hashtags.all %}
+      <span class="card-text"> {{ tag.tags }}</span>
+    {% endfor %}
     {% if posting.author == user %}
       <form action="{% url 'postings:update_posting' posting.id %}" method="get">
         <button type="submit" class="btn btn-primary"> Edit </button>
