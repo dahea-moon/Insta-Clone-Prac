@@ -106,21 +106,6 @@ def create_comment(request, posting_id):
 
 
 @login_required
-@require_http_methods(['GET', 'POST'])
-def update_comment(request, posting_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id)
-    if comment.author == request.user:
-        if request.method == 'POST':
-            form = CommentForm(request.POST, instance=comment)
-            if form.is_valid():
-                comment = form.save()
-                return redirect('posting_detail', id=comment.posting.id)
-        else:
-            form = CommentForm(instance=comment)
-    return redirect('posting_detail', id=comment.posting.id)
-
-
-@login_required
 @require_POST
 def delete_comment(request, posting_id, comment_id):
     posting = get_object_or_404(Posting, id=posting_id)
@@ -132,9 +117,7 @@ def delete_comment(request, posting_id, comment_id):
 
 @login_required
 def toggle_like(request, posting_id):
-    ajx = request.is_ajax()
-    print(ajx)
-    if request.is_ajax():
+    if request.is_ajax:
         posting = get_object_or_404(Posting, id=posting_id)
         user = request.user
         if posting.like_users.filter(id=user.id).exists():
@@ -152,7 +135,7 @@ def toggle_like(request, posting_id):
             'like_count': like_count,
         }
         return JsonResponse(context)
-    # else:
-    #     return HttpResponseBadRequest()
+    else:
+        return HttpResponseBadRequest()
 
 

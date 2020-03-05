@@ -17,18 +17,14 @@
     </a>
   </div>
   <div class="card-body">
-    <p class="card-text">{{ posting.author }}</p>
+    <a class="card-text" href="{% url 'accounts:user_page' posting.author.id %}"> <strong>{{ posting.author }}</strong></a>
     <p class="card-text">{{ posting.contents }}</p>
     {% if posting.hashtags %}
       <p class="card-text"> {{ posting.hashtags.tags }}</p>
     {% endif %}
-    <a href="{% url 'postings:like' posting.id %}" id="like" onclick="like();">
-    {% if liked %}
-    Unlike
-    {% else %}
-    Like
-    {% endif %}
-    </a> 
+    <span id="like">
+      <i class="{% if is_like %} fas {% else %} far {% endif %} fa-heart"></i>    
+    </span>
     <strong id="like-count">{{ posting.like_users.count }}</strong>
     {% if posting.author == user %}
       <form action="{% url 'postings:update_posting' posting.id %}" method="get">
@@ -41,17 +37,23 @@
     {% endif %}
   </div>
 </div>
-<script>
-  function like(){
-    {% if request.user.is_authenticated %}
-    $.ajax({
-      url: "{% url 'postings:like' posting.id %}",
-      crossDomain: false;
-    }).done(function (data) {
-      document.getElementById('like-count').innerHTML = data.like_count;
-    });
-    {% else %}
-    alert("You need to Log In!");
-    {% endif %}
-  }
+<script type="text/javascript">
+  const like = document.getElementById('like')
+
+  like.addEventListener('click', function(event){
+    const URL = '/instagram/{{ posting.id }}/like';
+    axios.default.xsrfCookieName = 'csrftokenn'
+    axios.default.xsrfHeaderName = 'X-CSRFToken'
+    axios.get(URL)
+        .then(res =>{
+          if (res.data.liked) { // like
+              event.target.classList.remove('far');
+              event.target.classList.add('fas');
+          } else { // unlike
+              event.target.classList.remove('fas');
+              event.target.classList.add('far');
+          }
+          document.getElementById('like-count').innerHTML = res.data.like_count
+        })
+  })
 </script>
